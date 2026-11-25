@@ -188,8 +188,6 @@ The broader philosophy is:
 
 > **If you want to carry more, build something that can physically carry it.**
 
----
-
 ## Potential Dependencies
 
 Initial concept assumes:
@@ -201,8 +199,144 @@ Initial concept assumes:
 
 These dependencies are tentative and should be reassessed if development ever begins.
 
+---
+
+### 3. Adjustable Block Lighting
+
+Status: Idea / Exploration
+
+A utility mod that allows users to change the light emission levels of existing blocks through a configuration file.
+
+The mod is intended to work alongside Ultrabright Lib, allowing existing light sources to emit light levels beyond Minecraft's normal maximum of 15.
+
+The goal is to make lighting more practical and configurable without introducing additional decorative blocks or requiring users to replace existing light sources.
+
+#### Core Concept
+
+Allow users to specify the desired light emission level of individual blocks.
+
+For example:
+
+- Vanilla torch: 14 → 25
+- Vanilla lantern: 15 → 30
+- Glowstone: 15 → 35
+- Industrial floodlight: configurable to 60 or higher
+
+The changes apply globally to the specified block type rather than individual placed blocks.
+
+Blocks not included in the configuration retain their normal light emission values.
+
+#### Configuration
+
+All lighting overrides should be managed through a configuration file.
+
+Potential format:
+
+```toml
+[blocks]
+
+# Vanilla
+"minecraft:torch" = 25
+"minecraft:wall_torch" = 25
+"minecraft:lantern" = 30
+"minecraft:wall_lantern" = 30
+"minecraft:glowstone" = 35
+"minecraft:sea_lantern" = 40
+
+# Modded blocks
+"immersiveengineering:example_lamp" = 45
+"some_mod:industrial_floodlight" = 60
+```
+
+The actual configuration format may change during implementation.
+
+Light levels should support values from 0 to 127, matching Ultrabright Lib's advertised maximum.
+
+A value of 0 disables the block's emitted light.
+
+#### Mod Compatibility
+
+The configuration should support blocks from any installed mod without requiring direct integration with those mods.
+
+Block identifiers should be resolved through Minecraft's block registry rather than hard-coded mod dependencies.
+
+Configuration entries for blocks belonging to mods that are not installed should:
+
+- Be ignored without causing errors.
+- Remain in the configuration file.
+- Automatically become active if the corresponding mod is installed later.
+
+This allows one configuration file to contain lighting settings for an entire mod collection, including optional mods.
+
+#### Block State Behavior
+
+Some blocks have state-dependent light emission.
+
+For example, a redstone lamp emits light when powered but not when unpowered.
+
+The override system should ideally preserve the original block's state-dependent behavior while changing its maximum or base emission value.
+
+The implementation should avoid unintentionally making normally unlit blocks emit light.
+
+#### World Lighting Updates
+
+Changes to emission values must apply to both newly placed and already existing blocks.
+
+Existing blocks should receive updated lighting when their chunks are loaded, and the resulting light levels must persist correctly after saving and reloading the world.
+
+The implementation should avoid unnecessary full-world lighting recalculations.
+
+#### Performance
+
+The mod should have minimal ongoing performance overhead.
+
+- No continuous block scanning.
+- No per-tick configuration processing.
+- No unnecessary block entity creation.
+- Resolve configured block identifiers during initialization.
+- Use efficient lookups when checking emission overrides.
+
+The actual lighting calculations and extended light propagation should be handled by Ultrabright Lib.
+
+#### Dependencies and Compatibility
+
+Initial concept assumes:
+
+- NeoForge
+- Ultrabright Lib
+
+The exact Minecraft version must be determined before development.
+
+The mod should not require individual content mods as dependencies.
+
+#### Initial Scope
+
+The initial version should focus exclusively on configuration-based block light overrides.
+
+The following are intentionally excluded:
+
+- In-game commands.
+- Configuration GUI.
+- Dynamic lighting from held items.
+- New light-emitting blocks.
+- Changes to light propagation distance or falloff.
+
+The priority is to make existing block light sources configurable and ensure that extended lighting works reliably.
+
+#### Future Possibilities
+
+Potential future additions include:
+
+- Optional configuration presets.
+- More advanced handling of state-dependent emission.
+- Additional compatibility improvements for other lighting and content mods.
+
+The project should remain a lightweight utility rather than becoming a general lighting overhaul.
+
 ## Future Ideas
 
 Additional Minecraft mod concepts can be added as separate sections or folders as they become interesting enough to document.
 
 This repository is primarily a place to **capture ideas before they disappear**, not a commitment to implement every idea.
+
+
